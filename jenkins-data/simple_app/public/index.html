@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>Hello world from index.html</h1>
+    
+    <div id="data-container">
+        <!-- Data will be displayed here -->
+    </div>
+
+    <script>
+        // Function to fetch data from the API
+        function fetchData() {
+            fetch('http://localhost:3000/api/hello')
+                .then(response => response.json()) // Assuming the API returns JSON
+                .then(data => {
+                    // Display the retrieved data in the data-container
+                    const dataContainer = document.getElementById('data-container');
+                    console.log(data)
+                    dataContainer.innerHTML = `<p>Response from API: ${data.message}</p>`;
+                })
+                .catch(error => {
+                    console.error('Error fetching data:', error);
+                });
+        }
+
+        // Call the fetchData function when the page loads
+        window.onload = fetchData;
+    </script> 
+</body>
+</html>

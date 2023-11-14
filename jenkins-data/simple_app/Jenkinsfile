@@ -1,0 +1,40 @@
+pipeline {
+    agent none
+    stages {
+        stage('Build') { 
+            agent {
+                docker {
+                    image 'node:20.9.0-alpine3.18' 
+                    args '-p 3000:3000' 
+                }
+            }
+            steps {
+                sh 'npm install' 
+            }
+        }
+
+        stage("Unit Test") {
+            agent {
+                docker {
+                    image 'node:20.9.0-alpine3.18' 
+                    args '-p 3000:3000' 
+                }
+            }
+            steps {
+                sh 'npm test'
+            }
+        }
+
+        stage("Regression Test") {
+            agent {
+                docker {
+                    image 'node:20.9.0-alpine3.18' 
+                    args '-p 3000:3000' 
+                }
+            }
+            steps {
+                sh 'echo \'Regression test\''
+            }
+        }
+    }
+}
