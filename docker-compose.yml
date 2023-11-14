@@ -1,0 +1,55 @@
+version: '3'
+services:
+  jenkins-docker:
+    image: docker:dind
+    container_name: jenkins-docker
+    hostname: docker
+    privileged: true
+    networks:
+      - jenkins
+    environment:
+      - DOCKER_TLS_CERTDIR=/certs
+    volumes:
+      - jenkins-docker-certs:/certs/client
+      - jenkins-data:/var/jenkins_home
+    command: --storage-driver overlay2
+    ports:
+      - "80:80"
+      
+  jenkins-blueocean:
+    build:
+      context: .
+    container_name: jenkins-blueocean
+    restart: on-failure
+    networks:
+      - jenkins
+    environment:
+      - DOCKER_HOST=tcp://docker:2376
+      - DOCKER_CERT_PATH=/certs/client
+      - DOCKER_TLS_VERIFY=1
+      - JAVA_OPTS=-Dhudson.plugins.git.GitSCM.ALLOW_LOCAL_CHECKOUT=true
+    volumes:
+      - jenkins-data:/var/jenkins_home
+      - jenkins-docker-certs:/certs/client:ro
+      - ./jenkins-data:/var/jenkins_home/jenkins-data
+    ports:
+      - "8080:8080" 
+      - "50000:50000"
+  
+  jenkins-sonarqube:
+    container_name: jenkins-sonarqube
+    image: sonarqube:latest
+    ports:
+      - "9000:9000"
+    environment:
+      - SONAR_ES_BOOTSTRAP_CHECKS_DISABLE=true
+    networks:
+      - jenkins
+
+networks:
+  jenkins:
+    driver: bridge
+
+volumes:
+  jenkins-data:
+  jenkins-docker-certs:
